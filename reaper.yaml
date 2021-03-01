@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandra-reaper
+  labels:
+    app: cassandra-reaper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cassandra-reaper
+  template:
+    metadata:
+      labels:
+        app: cassandra-reaper
+    spec:
+      imagePullSecrets:
+      - name: registry
+      containers:
+      - name: cassandra-reaper
+        image: thelastpickle/cassandra-reaper
+        imagePullPolicy: Always
+        env:
+        - name: REAPER_STORAGE_TYPE
+          value: cassandra
+        - name: REAPER_ENABLE_DYNAMIC_SEED_LIST
+          value: "false"
+        - name: REAPER_CASS_CONTACT_POINTS
+          value: '[cluster1-dc1-service]'
+        - name: REAPER_ENABLE_WEBUI_AUTH
+          value: "false"
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthcheck
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 45
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 1
+        ports:
+        - containerPort: 8081
+          name: 'admin-ui'
+        - containerPort: 8080
+          name: 'web-ui'

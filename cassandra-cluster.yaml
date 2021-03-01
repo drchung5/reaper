@@ -1,0 +1,21 @@
+apiVersion: cassandra.datastax.com/v1beta1
+kind: CassandraDatacenter
+metadata:
+  name: dc1
+spec:
+  clusterName: cluster1
+  serverType: cassandra
+  serverVersion: 3.11.10
+  serverImage: datastax/cassandra-mgmtapi-3_11_10:v0.1.22
+  managementApiAuth:
+    insecure: {}
+  size: 1
+  resources: {}
+  storageConfig:
+    cassandraDataVolumeClaimSpec:
+      storageClassName: server-storage
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
